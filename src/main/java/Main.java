@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        UsuarioSeguroAvanzado userExito=new
+        UsuarioSeguroAvanzado userExito=new UsuarioSeguroAvanzado("Eduardo", "Admin123", 3)
 
 
 
