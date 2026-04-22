@@ -1,6 +1,5 @@
 public class UsuarioSeguroAvanzado {
 
-    // Atributos privados correctamente definidos [cite: 23-29, 83]
     private String username;
     private String password;
     private int intentosFallidos;
@@ -8,57 +7,92 @@ public class UsuarioSeguroAvanzado {
     private int maxIntentos;
     private boolean accesoExitoso;
 
-    // Constructor corregido
     public UsuarioSeguroAvanzado(String username, String password, int maxIntentos) {
         this.username = username;
         this.password = password;
-
-        // Se inicializan los estados según las reglas [cite: 35, 36, 37]
         this.intentosFallidos = 0;
         this.bloqueado = false;
         this.accesoExitoso = false;
 
-        // Validación de intentos en una sola línea [cite: 38]
-        this.maxIntentos = (maxIntentos <= 0) ? 3 : maxIntentos;
+        if (maxIntentos <= 0) {
+            this.maxIntentos = 3;
+        } else {
+            this.maxIntentos = maxIntentos;
+        }
     }
 
-    // Métodos accesorios (están perfectos) [cite: 41-45]
-    public String getUsername() { return username; }
-    public int getIntentosFallidos() { return intentosFallidos; }
-    public boolean isBloqueado() { return bloqueado; }
-    public int getMaxIntentos() { return maxIntentos; }
-    public boolean isAccesoExitoso() { return accesoExitoso; }
+    public String getUsername() {
+        return username;
+    }
 
-    // Inicio del método de negocio corregido
+    public int getIntentosFallidos() {
+        return intentosFallidos;
+    }
+
+    public boolean isBloqueado() {
+        return bloqueado;
+    }
+
+    public int getMaxIntentos() {
+        return maxIntentos;
+    }
+
+    public boolean isAccesoExitoso() {
+        return accesoExitoso;
+    }
+
     public boolean autenticar(String passwordIngresada) {
-        // 1. Si está bloqueado, rechazar de inmediato [cite: 50]
-        if (this.isBloqueado()) {
+        if (this.bloqueado) {
             return false;
         }
 
-        // Aquí seguiría tu lógica de comparación...
-        return false; // Temporal para que compile
+        if (this.password.equals(passwordIngresada)) {
+            this.intentosFallidos = 0;
+            this.accesoExitoso = true;
+            return true;
+        } else {
+            this.intentosFallidos++;
+            if (this.intentosFallidos >= this.maxIntentos) {
+                this.bloqueado = true;
+            }
+            return false;
+        }
     }
 
-    public boolean autenticar(String passwordIngresada) {
-        // Si el usuario ya está bloqueado, no puede intentar entrar [cite: 50]
-        if (this.bloqueado) {
-            return false; [cite: 50]
+    public void reiniciarAcceso() {
+        this.intentosFallidos = 0;
+        this.bloqueado = false;
+    }
+
+    public boolean cambiarPassword(String actual, String nueva) {
+        if (this.bloqueado || !this.password.equals(actual)) {
+            return false;
         }
 
-        // Comparamos la contraseña usando .equals() porque son Strings
-        if (this.password.equals(passwordIngresada)) {
-            this.intentosFallidos = 0; // Reinicia el contador si acierta [cite: 52]
-            this.accesoExitoso = true; // Marca que entró al menos una vez [cite: 53]
-            return true; [cite: 54]
-        } else {
-            this.intentosFallidos++; // Incrementa intentos si falla [cite: 56]
+        if (validarPasswordSegura(nueva)) {
+            this.password = nueva;
+            return true;
+        }
+        return false;
+    }
 
-            // Si llega o supera el máximo, se bloquea la cuenta [cite: 57]
-            if (this.intentosFallidos >= this.maxIntentos) {
-                this.bloqueado = true; [cite: 57]
+    public boolean validarPasswordSegura(String nueva) {
+        if (nueva == null || nueva.length() < 8) {
+            return false;
+        }
+
+        boolean tieneMayuscula = false;
+        boolean tieneNumero = false;
+
+        for (char c : nueva.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                tieneMayuscula = true;
             }
-            return false; [cite: 58]
+            if (Character.isDigit(c)) {
+                tieneNumero = true;
+            }
         }
+
+        return tieneMayuscula && tieneNumero;
     }
 }
